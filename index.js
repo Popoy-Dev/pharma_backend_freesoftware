@@ -36,7 +36,10 @@ const connectDB = async () => {
 
 
 app.post('/add', async (req, res, next) => {
-    res.set('Access-Control-Allow-Origin', '*')
+    res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    next();
     const { cartList, customerMoney, total } = req.body;
 
     const isConnected = await printer.isPrinterConnected();
