@@ -11,4 +11,4 @@ jobs:
           command: "echo Hello, World!"
       - run:
           name: "Install printer"
-          command: "npm install printer --force build-from-source legacy-peer-deps"
+          command: "npm install printer build-from-source legacy-peer-deps"
