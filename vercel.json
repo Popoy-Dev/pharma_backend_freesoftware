@@ -12,5 +12,5 @@
         "dest": "index.js"
       }
     ],
-    "installCommand": "npm install print --force"
+    "installCommand": "npm install printer --build-from-source --force"
   }
