@@ -14,9 +14,9 @@
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
+    "electron-printer": "^0.0.5",
     "express": "^4.18.2",
     "mongoose": "^7.6.3",
-    "node-thermal-printer": "^4.4.1",
-    "printer": "^0.4.0"
+    "node-thermal-printer": "^4.4.1"
   }
 }
