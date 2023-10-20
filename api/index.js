@@ -2,7 +2,7 @@ require('dotenv').config()
 const express = require('express')
 const mongoose = require('mongoose')
 const cors = require("cors");
-// const Printer = require('node-thermal-printer');
+const Printer = require('node-thermal-printer');
 const Order = require('../models/orders')
 
 
@@ -17,12 +17,12 @@ app.use(bodyParser.json());
 app.use(cors({
     origin: '*', // Allow requests from any origin (for development/testing only)
 }));
-// const printer = new Printer.ThermalPrinter({
-//     type: Types.EPSON, // Printer type: 'star' or 'epson'
-//     interface: 'printer:XP-58 (copy 3)', // Printer
-//     // eslint-disable-next-line import/no-dynamic-require, global-require
-//     driver: require(electron ? 'electron-printer' : 'printer'),
-// });
+const printer = new Printer.ThermalPrinter({
+    type: Types.EPSON, // Printer type: 'star' or 'epson'
+    interface: 'printer:XP-58 (copy 3)', // Printer
+    // eslint-disable-next-line import/no-dynamic-require, global-require
+    driver: require(electron ? 'electron-printer' : 'printer'),
+});
 
 mongoose.set('strictQuery', false);
 
@@ -37,46 +37,46 @@ const connectDB = async () => {
 }
 
 
-// app.post('/add', async (req, res, next) => {
+app.post('/add', async (req, res, next) => {
 
-//     const { cartList, customerMoney, total } = req.body;
+    const { cartList, customerMoney, total } = req.body;
 
-//     const product = new Order({
-//         cartList,
-//       });
+    const product = new Order({
+        cartList,
+      });
       
-//       product.save().then(() => {
-//         console.log('Product saved successfully!');
-//       }).catch((err) => {
-//         console.log(err);
-//       });
+      product.save().then(() => {
+        console.log('Product saved successfully!');
+      }).catch((err) => {
+        console.log(err);
+      });
 
-//     const isConnected = await printer.isPrinterConnected();
-//     if (isConnected) {
-//         console.log('isConnected', isConnected)
-//         printer.openCashDrawer();
-//         printer.clear();
+    const isConnected = await printer.isPrinterConnected();
+    if (isConnected) {
+        console.log('isConnected', isConnected)
+        printer.openCashDrawer();
+        printer.clear();
 
-//         cartList.map(async (item) => {
-//             printer.bold(false);
-//             printer.alignLeft();
-//             printer.print(String(`${item.product_name} (${item.quantity} x ${item.selling_price}) `));
-//             printer.bold(true);
-//             printer.print(String(`${item.quantity * item.selling_price}`));
-//             printer.newLine();
-//         });
-//         printer.alignRight();
-//         printer.print(String(`Customer Money: ${customerMoney}`));
-//         printer.newLine();
-//         printer.print(String(`Total: ${total}`));
-//         printer.newLine();
-//         await printer.execute();
-//         res.status(201).json({ msg: "Print successfully" });
-//     } else {
-//         res.status(500).json({ msg: "printer is not connected" })
-//     }
+        cartList.map(async (item) => {
+            printer.bold(false);
+            printer.alignLeft();
+            printer.print(String(`${item.product_name} (${item.quantity} x ${item.selling_price}) `));
+            printer.bold(true);
+            printer.print(String(`${item.quantity * item.selling_price}`));
+            printer.newLine();
+        });
+        printer.alignRight();
+        printer.print(String(`Customer Money: ${customerMoney}`));
+        printer.newLine();
+        printer.print(String(`Total: ${total}`));
+        printer.newLine();
+        await printer.execute();
+        res.status(201).json({ msg: "Print successfully" });
+    } else {
+        res.status(500).json({ msg: "printer is not connected" })
+    }
 
-// })
+})
 
 app.get('/allOrder', async (req, res) => {
 
