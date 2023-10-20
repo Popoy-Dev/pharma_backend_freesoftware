@@ -21,7 +21,7 @@ const printer = new Printer.ThermalPrinter({
     type: Types.EPSON, // Printer type: 'star' or 'epson'
     interface: 'printer:XP-58 (copy 3)', // Printer
     // eslint-disable-next-line import/no-dynamic-require, global-require
-    driver: require('electron-printer'),
+    driver: require(electron ? 'electron-printer' : 'printer')
 });
 
 mongoose.set('strictQuery', false);
