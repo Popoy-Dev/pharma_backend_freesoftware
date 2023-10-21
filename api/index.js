@@ -8,7 +8,6 @@ const Order = require('../models/orders')
 const app = express()
 const PORT = process.env.PORT || 3000
 const bodyParser = require('body-parser');
-const Types = require("node-thermal-printer").types;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
