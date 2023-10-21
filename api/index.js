@@ -51,6 +51,8 @@ app.post('/add', async (req, res, next) => {
 
     const printer = new escpos.Printer(device, options);
     device.open(function (error) {
+        res.send("Something went wrong.", error)
+        console.log('error', error)
         printer
             .font('B')
             .align('ct')
