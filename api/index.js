@@ -20,10 +20,7 @@ mongoose.set('strictQuery', false);
 
 const connectDB = async () => {
     try {
-        const conn = await mongoose.connect('mongodb+srv://popoykua28:7pNUFGDof2Z041h9@cluster0.ouifla3.mongodb.net/', {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    })
+        const conn = await mongoose.connect(process.env.MONGO_URI)
         console.log(`Mongodb Connected: ${conn.connection.host}`)
     } catch (error) {
         console.log(error)
@@ -34,7 +31,7 @@ const connectDB = async () => {
 
 app.post('/add', async (req, res, next) => {
 
-    const { cartList, customerMoney, total } = req.body;
+    const { cartList, customerMoney, total, totalRegularPrice } = req.body;
 
     const product = new Order({
         cartList,
@@ -58,15 +55,84 @@ app.post('/add', async (req, res, next) => {
         printer
             .font('B')
             .align('ct')
-            .size(.1, .1)
+            .size(.18, .1)
             .text('Fayne Pharmacy')
-        cartList.map(async (item) => {
-            printer
-                .table([`${item.product_name} (${item.quantity} x ${item.selling_price})  `, ` ${item.quantity * item.selling_price}`])
-                .size(.1, .1)
+        printer
+            .size(.01, .01)
+            .text('')
+        printer
+            .size(.065, .065)
+            .text('006 San Miguel Phase 3 Fortune')
+            .text(' Marikina City')
+            .text('-------------------------------------')
 
+        cartList.map(async (item) => {
+            const formattedValue = (item.quantity * item.selling_price).toFixed(2);
+
+            printer
+                .size(.07, .07)
+                .tableCustom(
+                    [
+                        { text: `${item.product_name} (${item.quantity} x ${item.selling_price})  `, align: "LEFT", width: 0.43, style: 'A' },
+                        { text: formattedValue, align: "CENTER", width: 0.27, style: 'A' }
+                    ],
+                )
+            printer
+                .size(.01, .01)
+                .text('')
+
+            
 
         })
+        printer
+        .size(.065, .065)
+        .font('B')
+        .text('-------------------------------------')
+        printer
+        .size(.07, .07)
+        .tableCustom(
+            [
+                { text: `Items total`, align: "LEFT", width: 0.43, style: 'A' },
+                { text: totalRegularPrice, align: "CENTER", width: 0.27, style: 'A' }
+            ],
+        )
+        printer
+        .tableCustom(
+            [
+                { text: `for senior discount`, align: "LEFT", width: 0.43, style: 'A' },
+                { text: (totalRegularPrice - total).toFixed(2), align: "CENTER", width: 0.27, style: 'A' }
+            ],
+        )
+        printer
+        .size(.065, .065)
+        .font('B')
+        .text('-------------------------------------')
+        printer
+        .tableCustom(
+            [
+                { text: `Total Amount`, align: "LEFT", width: 0.43, style: 'B' },
+                { text: total, align: "CENTER", width: 0.27, style: 'B' }
+            ],
+        )
+        printer
+        .size(.065, .065)
+        .font('B')
+        .text('-------------------------------------')
+        printer
+        .tableCustom(
+            [
+                { text: `Customer Money`, align: "LEFT", width: 0.43, style: 'A' },
+                { text: customerMoney.toFixed(2), align: "CENTER", width: 0.27, style: 'A' }
+            ],
+        )
+        printer
+        .size(.07, .07)
+        .tableCustom(
+            [
+                { text: `Change`, align: "LEFT", width: 0.43, style: 'A' },
+                { text: (customerMoney.toFixed(2) - total).toFixed(2), align: "CENTER", width: 0.27, style: 'B', size: '.1' }
+            ],
+        )
         printer
             .font('B')
             .align('ct')
