@@ -31,18 +31,20 @@ const connectDB = async () => {
 
 app.post('/add', async (req, res, next) => {
 
-    const { cartList, customerMoney, total, totalRegularPrice } = req.body;
-
-    const product = new Order({
-        cartList,
-    });
-
-    product.save().then(() => {
-        console.log('Product saved successfully!');
-    }).catch((err) => {
-        console.log(err);
-    });
-
+    const { cartList, customerMoney, total, totalRegularPrice, reprint } = req.body;
+    if(!reprint || reprint === undefined) {
+        console.log('print here because its is new')
+        const product = new Order({
+            cartList,
+        });
+    
+        product.save().then(() => {
+            console.log('Product saved successfully!');
+        }).catch((err) => {
+            console.log(err);
+        });    
+    }
+ 
     const escpos = require('escpos');
     escpos.USB = require('escpos-usb');
     // Select the adapter based on your printer type
@@ -141,6 +143,7 @@ app.post('/add', async (req, res, next) => {
             .text('')
             .close();
     });
+    res.json("Success")
 
 })
 
