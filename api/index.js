@@ -30,14 +30,28 @@ const connectDB = async () => {
 
 
 app.post('/add', async (req, res, next) => {
+    const currentDate = new Date();
 
-    const { cartList, customerMoney, total, totalRegularPrice, reprint } = req.body;
-    if(!reprint || reprint === undefined) {
+    const month = (currentDate.getMonth() + 1).toString().padStart(2, '0'); // Adding 1 to the month because months are zero-based.
+    const day = currentDate.getDate().toString().padStart(2, '0');
+    const year = currentDate.getFullYear();
+
+    let hours = currentDate.getHours();
+    const ampm = hours >= 12 ? 'pm' : 'am';
+    hours = hours % 12 || 12; // Convert hours to 12-hour format.
+
+    const minutes = currentDate.getMinutes().toString().padStart(2, '0');
+
+    const formattedDate = `${month}/${day}/${year}`;
+    const formattedTime = `${hours}:${minutes} ${ampm}`;
+
+
+    const { cartList, customerMoney, total, totalRegularPrice, reprint, receiptDetails } = req.body;
+    if (!reprint || reprint === undefined) {
         console.log('print here because its is new')
         const product = new Order({
             cartList,
         });
-    
         product.save().then(() => {
             console.log('Product saved successfully!');
         }).catch((err) => {
@@ -58,14 +72,20 @@ app.post('/add', async (req, res, next) => {
             .font('B')
             .align('ct')
             .size(.18, .1)
-            .text('Fayne Pharmacy')
+            .text(` ${receiptDetails.pharmacy}`)
         printer
             .size(.01, .01)
             .text('')
         printer
             .size(.065, .065)
-            .text('006 San Miguel Phase 3 Fortune')
-            .text(' Marikina City')
+            .text(` ${receiptDetails.address}`)
+            .text('-------------------------------------')
+
+        printer
+            .align('LT')
+            .size(.057, .057)
+            .text(`Cashier: ${receiptDetails.cashierName}`)
+            .text(`${formattedDate} ${formattedTime}`)
             .text('-------------------------------------')
 
         cartList.map(async (item) => {
@@ -87,59 +107,59 @@ app.post('/add', async (req, res, next) => {
 
         })
         printer
-        .size(.065, .065)
-        .font('B')
-        .text('-------------------------------------')
+            .size(.065, .065)
+            .font('B')
+            .text('-------------------------------------')
         printer
-        .size(.07, .07)
-        .tableCustom(
-            [
-                { text: `Items total`, align: "LEFT", width: 0.43, style: 'A' },
-                { text: totalRegularPrice, align: "CENTER", width: 0.27, style: 'A' }
-            ],
-        )
+            .size(.07, .07)
+            .tableCustom(
+                [
+                    { text: `Items total`, align: "LEFT", width: 0.43, style: 'A' },
+                    { text: totalRegularPrice, align: "CENTER", width: 0.27, style: 'A' }
+                ],
+            )
         printer
-        .tableCustom(
-            [
-                { text: `for senior discount`, align: "LEFT", width: 0.43, style: 'A' },
-                { text: (totalRegularPrice - total).toFixed(2), align: "CENTER", width: 0.27, style: 'A' }
-            ],
-        )
+            .tableCustom(
+                [
+                    { text: `for senior discount`, align: "LEFT", width: 0.43, style: 'A' },
+                    { text: (totalRegularPrice - total).toFixed(2), align: "CENTER", width: 0.27, style: 'A' }
+                ],
+            )
         printer
-        .size(.065, .065)
-        .font('B')
-        .text('-------------------------------------')
+            .size(.065, .065)
+            .font('B')
+            .text('-------------------------------------')
         printer
-        .tableCustom(
-            [
-                { text: `Total Amount`, align: "LEFT", width: 0.43, style: 'B' },
-                { text: total, align: "CENTER", width: 0.27, style: 'B' }
-            ],
-        )
+            .tableCustom(
+                [
+                    { text: `Total Amount`, align: "LEFT", width: 0.43, style: 'B' },
+                    { text: total, align: "CENTER", width: 0.27, style: 'B' }
+                ],
+            )
         printer
-        .size(.065, .065)
-        .font('B')
-        .text('-------------------------------------')
+            .size(.065, .065)
+            .font('B')
+            .text('-------------------------------------')
         printer
-        .tableCustom(
-            [
-                { text: `Customer Money`, align: "LEFT", width: 0.43, style: 'A' },
-                { text: customerMoney.toFixed(2), align: "CENTER", width: 0.27, style: 'A' }
-            ],
-        )
+            .tableCustom(
+                [
+                    { text: `Customer Money`, align: "LEFT", width: 0.43, style: 'A' },
+                    { text: customerMoney.toFixed(2), align: "CENTER", width: 0.27, style: 'A' }
+                ],
+            )
         printer
-        .size(.07, .07)
-        .tableCustom(
-            [
-                { text: `Change`, align: "LEFT", width: 0.43, style: 'A' },
-                { text: (customerMoney.toFixed(2) - total).toFixed(2), align: "CENTER", width: 0.27, style: 'B', size: '.1' }
-            ],
-        )
+            .size(.07, .07)
+            .tableCustom(
+                [
+                    { text: `Change`, align: "LEFT", width: 0.43, style: 'A' },
+                    { text: (customerMoney.toFixed(2) - total).toFixed(2), align: "CENTER", width: 0.27, style: 'B', size: '.1' }
+                ],
+            )
         printer
             .font('B')
             .align('ct')
-            .size(2, 1)
-            .text('')
+            .size(.065, .065)
+            .text('-------------------------------------')
             .text('')
             .close();
     });

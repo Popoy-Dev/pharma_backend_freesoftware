@@ -15,6 +15,7 @@ const OrderSchema = new Schema({
           key: String,
           quantity: Number,
           senior_selling_price: String,
+          ownerId: String
         },
       ],
 })
