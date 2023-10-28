@@ -46,7 +46,7 @@ app.post('/add', async (req, res, next) => {
     const formattedTime = `${hours}:${minutes} ${ampm}`;
 
 
-    const { cartList, customerMoney, total, totalRegularPrice, reprint, receiptDetails } = req.body;
+    const { cartList, customerMoney, total, totalRegularPrice, reprint, receiptDetails, id } = req.body;
     if (!reprint || reprint === undefined) {
         console.log('print here because its is new')
         const product = new Order({
@@ -56,9 +56,9 @@ app.post('/add', async (req, res, next) => {
             console.log('Product saved successfully!');
         }).catch((err) => {
             console.log(err);
-        });    
+        });
     }
- 
+    const orderNumber = id.substring(id.length - 7)
     const escpos = require('escpos');
     escpos.USB = require('escpos-usb');
     // Select the adapter based on your printer type
@@ -82,9 +82,16 @@ app.post('/add', async (req, res, next) => {
             .text('-------------------------------------')
 
         printer
-            .align('LT')
             .size(.057, .057)
-            .text(`Cashier: ${receiptDetails.cashierName}`)
+            .tableCustom(
+                [
+                    { text: `Cashier: ${receiptDetails.cashierName}`, align: "LEFT", width: 0.43, style: 'A' },
+                    { text: `#: ${orderNumber}`, align: "CENTER", width: 0.27, style: 'A' }
+                ],
+            )
+        printer
+            .align('RT')
+            .size(.057, .057)
             .text(`${formattedDate} ${formattedTime}`)
             .text('-------------------------------------')
 
