@@ -78,8 +78,14 @@ app.post('/add', async (req, res, next) => {
             .text('')
         printer
             .size(.065, .065)
+            .align('ct')
             .text(` ${receiptDetails.address}`)
             .text('-------------------------------------')
+
+        printer
+            .size(.065, .065)
+            .align('LT')
+            .text(`TIN #: ${receiptDetails.tin_no}`)
 
         printer
             .size(.057, .057)
@@ -110,7 +116,7 @@ app.post('/add', async (req, res, next) => {
                 .size(.01, .01)
                 .text('')
 
-            
+
 
         })
         printer
@@ -162,6 +168,15 @@ app.post('/add', async (req, res, next) => {
                     { text: (customerMoney.toFixed(2) - total).toFixed(2), align: "CENTER", width: 0.27, style: 'B', size: '.1' }
                 ],
             )
+
+        printer
+            .size(.065, .065)
+            .text('-------------------------------------')
+            .align('ct')
+            .text(`For inquiries, please reach out via Viber or give us a call. `)
+            .text(`${receiptDetails.cell_no}`)
+            .text(`Acknowledge Receipt`)
+            .text(`Jeremiah 29:11`)
         printer
             .font('B')
             .align('ct')
