@@ -3,6 +3,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const cors = require("cors");
 const Order = require('../models/orders')
+const Ads = require('../models/ads')
 
 
 const app = express()
@@ -188,6 +189,20 @@ app.post('/add', async (req, res, next) => {
     res.json("Success")
 
 })
+
+app.get('/advertisements', async (req, res) => {
+    try {
+        const advertisements = await Ads.find();
+        if (advertisements.length > 0) {
+            res.json(advertisements);
+        } else {
+            res.send("No advertisements found.");
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Something went wrong.");
+    }
+});
 
 app.get('/allOrder', async (req, res) => {
 
