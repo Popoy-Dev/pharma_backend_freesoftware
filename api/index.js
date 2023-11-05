@@ -7,7 +7,7 @@ const Ads = require('../models/ads')
 
 
 const app = express()
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 5012
 const bodyParser = require('body-parser');
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -21,8 +21,8 @@ mongoose.set('strictQuery', false);
 
 const connectDB = async () => {
     try {
-        const conn = await mongoose.connect(process.env.MONGO_URI)
-        console.log(`Mongodb Connected: ${conn.connection.host}`)
+        const conn = await mongoose.connect("mongodb+srv://popoykua28:7pNUFGDof2Z041h9@cluster0.ouifla3.mongodb.net/")
+        console.log(`Printer is connected`)
     } catch (error) {
         console.log(error)
         process.exit(1)
@@ -73,26 +73,26 @@ app.post('/add', async (req, res, next) => {
             .font('B')
             .align('ct')
             .size(.18, .1)
-            .text(` ${receiptDetails.pharmacy}`)
+            .text(` ${receiptDetails?.pharmacy}`)
         printer
             .size(.01, .01)
             .text('')
         printer
             .size(.065, .065)
             .align('ct')
-            .text(` ${receiptDetails.address}`)
+            .text(` ${receiptDetails?.address}`)
             .text('-------------------------------------')
 
         printer
             .size(.065, .065)
             .align('LT')
-            .text(`TIN #: ${receiptDetails.tin_no}`)
+            .text(`TIN #: ${receiptDetails?.tin_no}`)
 
         printer
             .size(.057, .057)
             .tableCustom(
                 [
-                    { text: `Cashier: ${receiptDetails.cashierName}`, align: "LEFT", width: 0.43, style: 'A' },
+                    { text: `Cashier: ${receiptDetails?.cashierName}`, align: "LEFT", width: 0.43, style: 'A' },
                     { text: `#: ${orderNumber}`, align: "CENTER", width: 0.27, style: 'A' }
                 ],
             )
@@ -175,7 +175,7 @@ app.post('/add', async (req, res, next) => {
             .text('-------------------------------------')
             .align('ct')
             .text(`For inquiries, please reach out via Viber or give us a call. `)
-            .text(`${receiptDetails.cell_no}`)
+            .text(`${receiptDetails?.cell_no}`)
             .text(`Acknowledge Receipt`)
             .text(`Jeremiah 29:11`)
         printer
