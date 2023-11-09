@@ -70,6 +70,7 @@ app.post('/add', async (req, res, next) => {
     device.open(function (error) {
         console.log('error', error)
         printer
+            .cashdraw()
             .font('B')
             .align('ct')
             .size(.18, .1)
