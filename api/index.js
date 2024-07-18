@@ -1,5 +1,6 @@
 require('dotenv').config()
 const express = require('express')
+const dns = require('dns')
 const mongoose = require('mongoose')
 const cors = require("cors");
 const Order = require('../models/orders')
@@ -18,16 +19,44 @@ app.use(cors({
 
 
 mongoose.set('strictQuery', false);
+const checkInternetConnection = () => {
+    return new Promise((resolve) => {
+        dns.lookup('google.com', (err) => {
+            if (err && err.code === "ENOTFOUND") {
+                resolve(false);
+            } else {
+                resolve(true);
+            }
+        });
+    });
+};
+
+const checkDBConnection = async (req, res, next) => {
+    const isInternetConnected = await checkInternetConnection();
+    if (!isInternetConnected) {
+        console.log('No internet')
+        return res.status(200).json({ message: 'No internet connection, please try again later.' });
+    }
+
+    if (mongoose.connection.readyState !== 1) { // 1 means connected
+        console.log('No internet')
+        return res.status(200).json({ message: 'Service is currently offline, please try again later.' });
+    }
+
+    next();
+};
 
 const connectDB = async () => {
     try {
-        const conn = await mongoose.connect("mongodb+srv://popoykua28:7pNUFGDof2Z041h9@cluster0.ouifla3.mongodb.net/")
-        console.log(`Printer is connected`)
+        const conn = await mongoose.connect("mongodb+srv://popoykua28:7pNUFGDof2Z041h9@cluster0.ouifla3.mongodb.net/", {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        });
+        console.log(`MongoDB connected: ${conn.connection.host}`);
     } catch (error) {
-        console.log(error)
-        process.exit(1)
+        console.error(`Error: ${error.message}`);
     }
-}
+};
 
 
 app.post('/add', async (req, res, next) => {
@@ -50,14 +79,14 @@ app.post('/add', async (req, res, next) => {
     const { cartList, customerMoney, total, totalRegularPrice, reprint, receiptDetails, id } = req.body;
     if (!reprint || reprint === undefined) {
         console.log('print here because its is new')
-        const product = new Order({
-            cartList,
-        });
-        product.save().then(() => {
-            console.log('Product saved successfully!');
-        }).catch((err) => {
-            console.log(err);
-        });
+        // const product = new Order({
+        //     cartList,
+        // });
+        // product.save().then(() => {
+        //     console.log('Product saved successfully!');
+        // }).catch((err) => {
+        //     console.log(err);
+        // });
     }
     const orderNumber = id.substring(id.length - 7)
     const escpos = require('escpos');
@@ -191,7 +220,7 @@ app.post('/add', async (req, res, next) => {
 
 })
 
-app.get('/advertisements', async (req, res) => {
+app.get('/advertisements',checkDBConnection,  async (req, res) => {
     try {
         const advertisements = await Ads.find();
         if (advertisements.length > 0) {
@@ -205,7 +234,7 @@ app.get('/advertisements', async (req, res) => {
     }
 });
 
-app.get('/allOrder', async (req, res) => {
+app.get('/allOrder',checkDBConnection, async (req, res) => {
 
     const orders = await Order.find()
     if (orders) {
